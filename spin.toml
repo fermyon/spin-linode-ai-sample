@@ -1,0 +1,31 @@
+spin_manifest_version = 2
+
+[application]
+authors = ["Thorsten Hans <thorsten.hans@fermyon.com>"]
+description = ""
+name = "spin-deepseek-linode"
+version = "0.1.0"
+
+[variables]
+ollama_base_url = { required = true }
+ollama_model = { required = true }
+temperature = { default = "0.4" }
+
+[[trigger.http]]
+route = "/..."
+component = "spin-deepseek-linode"
+
+[component.spin-deepseek-linode]
+source = "dist/spin-deepseek-linode.wasm"
+exclude_files = ["**/node_modules"]
+allowed_outbound_hosts = ["{{ ollama_base_url }}"]
+
+[component.spin-deepseek-linode.variables]
+ollama_base_url = "{{ ollama_base_url }}"
+ollama_model = "{{ ollama_model }}"
+temperature = "{{ temperature }}"
+
+
+[component.spin-deepseek-linode.build]
+command = ["npm install", "npm run build"]
+watch = ["src/**/*.ts"]
