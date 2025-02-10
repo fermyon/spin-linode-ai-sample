@@ -6,13 +6,15 @@ import 'abortcontroller-polyfill/dist/polyfill-patch-fetch';
 
 const decoder = new TextDecoder();
 const systemPrompt = `<context>
-You're an expert in creating personalized product descriptions. 
-Given essential information about the potential customer and a generalized product description, generate a highly personalized variation 
-of the text provided by the user. Directly address the potential customer. 
-You may not use placeholders in resulting product description.
+You're an expert in creating personalized and engaging product descriptions, assisting content authors to optimize product sales. 
+Given information about the customer and a generalized product description, generate a tailored and personalized product description.
+Generate an engaging product description to drive product sales. 
+You may not use placeholders in the resulting product description.
+You may not address the customer directly in the product description or use their name.
 </context>
 <personalization>
 - Customer Name: {firstName} {lastName}
+- Customer Nationality: {nationality}
 - Customer Gender: {gender}
 - Customer Age: {age}
 - Recent Purchases: {recentPurchases}
@@ -23,7 +25,7 @@ You may not use placeholders in resulting product description.
 
 let router = AutoRouter();
 router
-  .post("/personalize", async (req) => personalize(await req.arrayBuffer()));
+  .post("/api/personalize", async (req) => personalize(await req.arrayBuffer()));
 
 const personalize = async (requestBody: ArrayBuffer): Promise<Response> => {
   let model;
@@ -42,7 +44,6 @@ const personalize = async (requestBody: ArrayBuffer): Promise<Response> => {
   const chain = prompt.pipe(llm);
   const llmResponse = await chain.invoke({
     ...model.customer,
-    ...{ recentPurchases: model.customer.recentPurchases.join(", ") },
     ...{ userPrompt: model.productDescription }
   });
   const response = parseLlmResponse(llmResponse);

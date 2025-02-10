@@ -63,6 +63,6 @@ export interface Customer {
   lastName: string,
   age: number,
   gender: string,
-  recentPurchases: Array<string>
+  nationality: string,
+  recentPurchases: string,
 }
-

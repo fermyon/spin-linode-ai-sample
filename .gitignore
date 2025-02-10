@@ -1,5 +1,1 @@
-node_modules
-dist
-target
-.spin/
-build/
+.spin-aka/
