@@ -25,9 +25,43 @@ You may not address the customer directly in the product description or use thei
 
 let router = AutoRouter();
 router
-  .post("/api/personalize", async (req) => personalize(await req.arrayBuffer()));
+  .post("/api/personalize", async (req) => personalization(await req.arrayBuffer()))
+  .post("/api/personalize-with-streaming", async (req) => streamPersonalization(await req.arrayBuffer()));
 
-const personalize = async (requestBody: ArrayBuffer): Promise<Response> => {
+const streamPersonalization = async (requestBody: ArrayBuffer): Promise<Response> => {
+  let model;
+  try {
+    model = JSON.parse(decoder.decode(requestBody)) as PersonalizationRequest;
+  } catch (error) {
+    return new Response("Bad Request", { status: 400 });
+  }
+  const config = loadConfig();
+  const llm = new Ollama({
+    baseUrl: config.ollamaBaseUrl,
+    model: config.ollamaModel,
+    temperature: config.temperature,
+  });
+  let prompt = PromptTemplate.fromTemplate(systemPrompt);
+  const chain = prompt.pipe(llm);
+  const stream = await chain.stream({
+    ...model.customer,
+    ...{ userPrompt: model.productDescription }
+  });
+  const encoder = new TransformStream({
+    transform(chunk, controller) {
+      const enc = new TextEncoder();
+      controller.enqueue(enc.encode(chunk));
+    }
+  });
+  const transformed = (stream as ReadableStream).pipeThrough(encoder);
+  return new Response(transformed, {
+    status: 200, headers: {
+      "Content-Encoding": "none",
+      "Content-Type": "text/event-stream; charset=utf-8"
+    }
+  })
+}
+const personalization = async (requestBody: ArrayBuffer): Promise<Response> => {
   let model;
   try {
     model = JSON.parse(decoder.decode(requestBody)) as PersonalizationRequest;

@@ -40,3 +40,14 @@ When running the Spin application on your local machine, you can specify applica
 ```console
 SPIN_VARIABLE_OLLAMA_BASE_URL="http://1.2.3.4:11434" SPIN_VARIABLE_OLLAMA_MODEL="deepseek-r1:latest" spin up
 ```
+
+
+## Direct API invocation
+
+
+The API endpoints could also be invoked directly, see the following `curl` command:
+
+```console
+curl -XPOST -d '{"productDescription":"This is the brand new Smart Speaker 2000 it is amazing","customer":{"firstName":"Sasha","lastName":"Jones","gender":"Male","nationality":"German","age":31,"recentPurchases":"New Outdoor shoes"}}' http://127.0.0.1:3000/api/personalize-with-streaming -i
+```
+```
