@@ -6,7 +6,7 @@ import 'abortcontroller-polyfill/dist/polyfill-patch-fetch';
 
 const decoder = new TextDecoder();
 const systemPrompt = `<context>
-You're an expert in creating personalized and engaging product descriptions, assisting content authors to optimize product sales. 
+You're an expert in creating personalized and engaging product descriptions working at personaliZon. For the personaliZon webshop, you must create product descriptions to drive sales. 
 Given information about the customer and a generalized product description, generate a tailored and personalized product description.
 Generate an engaging product description to drive product sales. 
 You may not use placeholders in the resulting product description.
@@ -15,6 +15,7 @@ You may not address the customer directly in the product description or use thei
 <personalization>
 - Customer Name: {firstName} {lastName}
 - Customer Nationality: {nationality}
+- Customer speaks: English
 - Customer Gender: {gender}
 - Customer Age: {age}
 - Recent Purchases: {recentPurchases}
@@ -72,7 +73,7 @@ const personalization = async (requestBody: ArrayBuffer): Promise<Response> => {
   const llm = new Ollama({
     baseUrl: config.ollamaBaseUrl,
     model: config.ollamaModel,
-    temperature: config.temperature
+    temperature: config.temperature,
   });
   let prompt = PromptTemplate.fromTemplate(systemPrompt);
   const chain = prompt.pipe(llm);

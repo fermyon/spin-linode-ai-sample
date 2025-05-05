@@ -1,94 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="" class="dark">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DeepSeek powered by Linode & Fermyon Wasm Functions</title>
-    <link href="/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <meta charset="UTF-8">
+  <link rel="icon" href="/favicon.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>personaliZon - Personalized Product Descriptions</title>
 </head>
 
-<body>
-    <nav class="navbar bg-dark border-bottom border-body" data-bs-theme="dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">DeepSeek powered by Linode & Fermyon Wasm Functions</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-        </div>
-    </nav>
-    <div class="container mt-3">
-        <h2>Generate Personalized Product Descriptions</h2>
-        <form>
-            <div class="row p-1">
-                <div class="col">
-                    <label for="customerFirstName" class="form-label">First Name</label>
-                    <input type="text" class="form-control" id="customerFirstName" placeholder="First name"
-                        aria-label="First name">
-                </div>
-                <div class="col">
-                    <label for="customerLastName" class="form-label">Last Name</label>
-                    <input type="text" class="form-control" id="customerLastName" placeholder="Last name"
-                        aria-label="Last name">
-                </div>
-            </div>
-            <div class="row p-1">
-                <div class="col">
-                    <label for="customerGender" class="form-label">Gender</label>
-                    <input type="text" class="form-control" id="customerGender" placeholder="Gender"
-                        aria-label="Gender">
-                </div>
-                <div class="col">
-                    <label for="customerAge" class="form-label">Age</label>
-                    <input type="number" min="0" max="120" id="customerAge" class="form-control" placeholder="Age"
-                        aria-label="Age">
-                </div>
-                <div class="col">
-                    <label for="customerNationality" class="form-label">Nationality</label>
-                    <input type="text" id="customerNationality" class="form-control" placeholder="Country"
-                        aria-label="Nationality">
-                </div>
-            </div>
-            <div class="row p-1">
-                <div class="col">
-                    <label for="recentPurchases" class="form-label">Recent Purchases</label>
-                    <textarea class="form-control" id="recentPurchases" rows="3"
-                        placeholder="Recent Purchases"></textarea>
-                </div>
-            </div>
-            <div class="row p-1">
-                <div class="col">
-                    <label for="productDescription" class="form-label">Product Description</label>
-                    <textarea class="form-control" id="productDescription" rows="3"
-                        placeholder="General Product Description"></textarea>
-                </div>
-            </div>
-            <div class="row p-1">
-                <div class="col text-center">
-                    <button type="button" id="run" class="btn btn-primary">Generate Personalized Product
-                        Description</button>
-                </div>
-            </div>
-        </form>
-        <hr class="mt-2 mb-2" />
-        <form>
-            <div class="row p-2">
-                <div class="col">
-                    <label for="aiResponse" class="form-label">Product Description</label>
-                    <textarea disabled="disabled" readonly class="form-control" id="aiResponse" rows="15"
-                        placeholder="Personalized Product Description"></textarea>
-                </div>
-                <div class="col">
-                    <label for="aiReasoning" class="form-label">DeepSeek Reasoning</label>
-                    <textarea disabled="disabled" readonly class="form-control" id="aiReasoning" rows="15"
-                        placeholder="DeepSeek Reasoning"></textarea>
-                </div>
-            </div>
-        </form>
-    </div>
-    <script src="/app.js"></script>
+<body class="bg-slate-100">
+  <div class="pt-30 flex flex-col justify-center items-center" id="app"></div>
+
+  <script type="module" src="/src/main.ts"></script>
 </body>
 
 </html>

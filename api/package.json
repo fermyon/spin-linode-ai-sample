@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@fermyon/spin-sdk": "^3.0.0",
-    "@langchain/core": "^0.3.37",
+    "@langchain/core": "^0.3.40",
     "@langchain/ollama": "0.1.5",
     "abortcontroller-polyfill": "^1.7.8",
     "itty-router": "^5.0.18"
