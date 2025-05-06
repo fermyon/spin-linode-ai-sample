@@ -29,6 +29,14 @@ router
   .post("/api/personalize", async (req) => personalization(await req.arrayBuffer()))
   .post("/api/personalize-with-streaming", async (req) => streamPersonalization(await req.arrayBuffer()));
 
+const getOllama = (): Ollama => {
+  const config = loadConfig();
+  return new Ollama({
+    baseUrl: config.ollamaBaseUrl,
+    model: config.ollamaModel,
+    temperature: config.temperature,
+  });
+}
 const streamPersonalization = async (requestBody: ArrayBuffer): Promise<Response> => {
   let model;
   try {
@@ -36,12 +44,7 @@ const streamPersonalization = async (requestBody: ArrayBuffer): Promise<Response
   } catch (error) {
     return new Response("Bad Request", { status: 400 });
   }
-  const config = loadConfig();
-  const llm = new Ollama({
-    baseUrl: config.ollamaBaseUrl,
-    model: config.ollamaModel,
-    temperature: config.temperature,
-  });
+  const llm = getOllama();
   let prompt = PromptTemplate.fromTemplate(systemPrompt);
   const chain = prompt.pipe(llm);
   const stream = await chain.stream({
@@ -69,12 +72,7 @@ const personalization = async (requestBody: ArrayBuffer): Promise<Response> => {
   } catch (error) {
     return new Response("Bad Request", { status: 400 });
   }
-  const config = loadConfig();
-  const llm = new Ollama({
-    baseUrl: config.ollamaBaseUrl,
-    model: config.ollamaModel,
-    temperature: config.temperature,
-  });
+  const llm = getOllama();
   let prompt = PromptTemplate.fromTemplate(systemPrompt);
   const chain = prompt.pipe(llm);
   const llmResponse = await chain.invoke({

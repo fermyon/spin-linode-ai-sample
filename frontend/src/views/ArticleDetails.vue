@@ -14,7 +14,7 @@ const route = useRoute();
 const productsStore = useProductsStore();
 const userStore = useUserStore();
 const aiResponse = ref('')
-const aiReasoning = ref('')
+
 const productPrice = computed(()=> {
     const currency = "$";
     if(!product.value){
@@ -41,36 +41,48 @@ async function generateProductDescription(event: Event) {
     }
     isGenerating.value = true
     let selectedIdentity = userStore.users.find(user => user.id == selectedUserId.value);
-    if (!!selectedIdentity) {
-        const payload = {
-            productDescription: product.value!.description,
-            customer: {
-                firstName: selectedIdentity.firstName,
-                lastName: selectedIdentity.lastName,
-                gender: selectedIdentity.gender,
-                nationality: selectedIdentity.nationality,
-                age: selectedIdentity.age,
-                recentPurchases: selectedIdentity.purchaseHistory
+    try{
+        if (!!selectedIdentity) {
+            const payload = {
+                productDescription: product.value!.description,
+                customer: {
+                    firstName: selectedIdentity.firstName,
+                    lastName: selectedIdentity.lastName,
+                    gender: selectedIdentity.gender,
+                    nationality: selectedIdentity.nationality,
+                    age: selectedIdentity.age,
+                    recentPurchases: selectedIdentity.purchaseHistory
+                }
+            };
+            const response = await fetch("/api/personalize-with-streaming", {
+                body: JSON.stringify(payload),
+                method: "POST",
+                headers: {
+                "content-type": "application/json"
+                }
+            });
+            isGenerating.value = false
+            const reader = response.body!.getReader();
+            const decoder = new TextDecoder('utf-8');
+            let accumulatedMarkdown = '';
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                const chunk = decoder.decode(value, { stream: true });
+                accumulatedMarkdown += chunk;
+                aiResponse.value = await marked.parse(accumulatedMarkdown);
             }
-        };
-
-        const response = await fetch("/api/personalize", {
-            body: JSON.stringify(payload),
-            method: "POST",
-            headers: {
-            "content-type": "application/json"
             }
-        });
-        isGenerating.value = false
-        const json_response = await response.json();
-        let [aiThoughts, aiWords ] = await Promise.all([marked(json_response.reasoning), marked(json_response.response)]);
-        aiResponse.value = aiWords;        
-        aiReasoning.value = aiThoughts;
-
-        event.preventDefault();
-        return false;
-    }
-    
+        }
+        catch (error) {
+            console.log(`Error happened: ${error}`);
+        }
+        finally {
+            isGenerating.value = false
+            event.preventDefault();
+            return false;
+        }
+     
 }
 </script>
 <template>
@@ -119,10 +131,6 @@ async function generateProductDescription(event: Event) {
             <div class="mt-10" v-if="!!aiResponse">
                 <h2 class="text-gray-800 text-2xl mb-5">Personalized Product Description</h2>
                 <div id="ai-response" class="text-gray-800 text-lg text-wrap leading-10" v-html="aiResponse"></div>
-            </div>
-            <div class="mt-10" v-if="!!aiReasoning">
-                <h2 class="text-gray-800 text-2xl mb-5">AI Reasoning</h2>
-                <div id="ai-response" class="text-gray-800 text-lg text-wrap leading-10" v-html="aiReasoning"></div>
             </div>
         </aside>
     </main>

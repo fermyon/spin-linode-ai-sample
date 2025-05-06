@@ -3,13 +3,13 @@ spin_manifest_version = 2
 [application]
 authors = ["Thorsten Hans <thorsten.hans@fermyon.com>"]
 description = ""
-name = "spin-deepseek-linode"
+name = "personalizon"
 version = "0.1.0"
 
 [variables]
 
 ollama_base_url = { required = true }
-ollama_model = { default = "deepseek-r1:latest" }
+ollama_model = { default = "mistral" }
 temperature = { default = "0.4" }
 
 [[trigger.http]]
