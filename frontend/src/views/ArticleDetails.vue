@@ -90,7 +90,7 @@ async function generateProductDescription(event: Event) {
         <aside class="mb-2"><RouterLink class="text-lg text-purple-600" to="/">&lt; Go Back</RouterLink></aside>
         <h1 class="text-gray-800 text-5xl mb-2">{{ product!.name }}</h1>
         <header class="flex flex-row items-start mb-10 mt-5">
-            <img :src="product.image" class="mr-8"/>
+            <img :src="product.image" class="mr-8 max-w-md max-h-md"/>
             <div class="flex flex-col">
                 <h1 class="text-gray-800 text-3xl mb-2">{{ productPrice }}</h1>
                 <h2 class="text-gray-800 text-lg mb-2">{{ product!.shortDescription }}</h2>
@@ -128,7 +128,7 @@ async function generateProductDescription(event: Event) {
         </div>
         </aside>
         <aside>
-            <div class="mt-10" v-if="!!aiResponse">
+            <div class="mt-10 mb-20" v-if="!!aiResponse">
                 <h2 class="text-gray-800 text-2xl mb-5">Personalized Product Description</h2>
                 <div id="ai-response" class="text-gray-800 text-lg text-wrap leading-10" v-html="aiResponse"></div>
             </div>
