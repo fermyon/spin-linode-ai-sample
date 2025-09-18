@@ -1,5 +1,4 @@
-import { Variables } from "@fermyon/spin-sdk"
-
+import * as Variables from "@spinframework/spin-variables";
 export interface PersonalizationRequest {
   productDescription: string,
   customer: Customer,
