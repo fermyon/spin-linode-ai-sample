@@ -14,6 +14,7 @@ const route = useRoute();
 const productsStore = useProductsStore();
 const userStore = useUserStore();
 const aiResponse = ref('')
+const ellapsedTime: Ref<number> = ref(0);
 
 const productPrice = computed(()=> {
     const currency = "$";
@@ -35,6 +36,7 @@ watch(() => route.params.id, (newId) => {
     
 }, { immediate: true })
 
+
 async function generateProductDescription(event: Event) {
     if (selectedUserId.value == 0) {
         return
@@ -54,6 +56,7 @@ async function generateProductDescription(event: Event) {
                     recentPurchases: selectedIdentity.purchaseHistory
                 }
             };
+            const startTime = Date.now();
             const response = await fetch("/api/personalize-with-streaming", {
                 body: JSON.stringify(payload),
                 method: "POST",
@@ -61,8 +64,11 @@ async function generateProductDescription(event: Event) {
                 "content-type": "application/json"
                 }
             });
+            const endTime = Date.now();
             isGenerating.value = false
             const reader = response.body!.getReader();
+            
+            ellapsedTime.value = endTime - startTime;
             const decoder = new TextDecoder('utf-8');
             let accumulatedMarkdown = '';
             while (true) {
@@ -72,6 +78,11 @@ async function generateProductDescription(event: Event) {
                 accumulatedMarkdown += chunk;
                 aiResponse.value = await marked.parse(accumulatedMarkdown);
             }
+            // Scroll to bottom when streaming is complete
+            window.scrollTo({
+                top: document.body.scrollHeight,
+                behavior: 'smooth'
+            });
             }
         }
         catch (error) {
@@ -97,27 +108,26 @@ async function generateProductDescription(event: Event) {
                 <h2 class="text-gray-800 text-lg">🏷️ Category: {{ product!.category }}</h2>
             </div>
         </header>
-        <aside class="mb-10">
-            <h2 class="text-gray-800 text-3xl mb-5">Product Description</h2>
-            <div class="text-gray-800 text-lg text-wrap leading-10">{{  product!.description }}</div>
-            
-        </aside>   
-        <aside class="mb-10">
+        <aside class="mb-10 personalization text-center">
             <h2 class="text-gray-800 text-3xl mb-5">Personalize</h2>
-            <div class="flex flex-col space-y-5 max-w-2xl">
+            <div class="flex flex-col space-y-5 max-w-2xl mx-auto">
             <select v-model="selectedUserId" 
-                class="border rounded-md text-gray-800 px-4 py-2"
-                :class="[selectedUserId == 0 ? 'border-red-400': 'border-teal-800' ]">
-                <option value="0" selected>Please select an Identity for creating a personalized product description</option>
+                class="border-2 rounded-lg text-gray-800 px-4 py-3 bg-white shadow-md hover:shadow-lg focus:shadow-lg focus:outline-none transition-all duration-200 font-medium"
+                :class="[selectedUserId == 0 ? 'border-red-400 focus:border-red-500': 'border-purple-300 focus:border-purple-500' ]">
+                <option value="0" selected class="text-gray-500">Please select an Identity for creating a personalized product description</option>
                 <option v-for="u in userStore.users" 
-                    :value="u.id">{{ u.firstName }} {{ u.lastName }} ({{ u.age }} {{ u.gender }})</option>
+                    :value="u.id" 
+                    class="text-gray-800 py-2">{{ u.firstName }} {{ u.lastName }} ({{ u.age }} {{ u.gender }})</option>
             </select>
 
         
             <div class="flex flex-row space-x-5">
                 <button @click="generateProductDescription" 
-                    :class="[isGenerating? 'disabled cursor-default text-gray-600': 'cursor-pointer bg-slate-400 text-gray-800']"
-                class="border grow border-teal-800  p-2 text-lg rounded-lg" type="button">Generate Personalized Product Description</button>
+                    :class="[isGenerating? 'disabled cursor-default text-gray-600 bg-gray-300': 'cursor-pointer bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200']"
+                class="border-0 grow p-3 text-lg rounded-lg font-semibold" type="button">
+                    <span v-if="!isGenerating">✨ Generate Personalized Description</span>
+                    <span v-else>Generating...</span>
+                </button>
                 <div class="items-center" role="status" v-if="isGenerating">
                 <svg aria-hidden="true" class="mx-auto w-10 h-10 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
@@ -126,12 +136,17 @@ async function generateProductDescription(event: Event) {
               </div>
             </div>
         </div>
+        <div class="text-gray-800 text-lg text-wrap leading-10" v-if="ellapsedTime > 0">Time till first byte: {{ ellapsedTime }}ms</div>
         </aside>
-        <aside>
-            <div class="mt-10 mb-20" v-if="!!aiResponse">
+        <div :class="[aiResponse ? 'grid grid-cols-1 lg:grid-cols-2 gap-8' : '']" class="mb-10">
+            <aside>
+                <h2 class="text-gray-800 text-2xl mb-5">Product Description</h2>
+                <div class="text-gray-800 text-lg text-wrap leading-10">{{  product!.description }}</div>
+            </aside>
+            <aside v-if="!!aiResponse">
                 <h2 class="text-gray-800 text-2xl mb-5">Personalized Product Description</h2>
                 <div id="ai-response" class="text-gray-800 text-lg text-wrap leading-10" v-html="aiResponse"></div>
-            </div>
-        </aside>
+            </aside>
+        </div>
     </main>
 </template>
