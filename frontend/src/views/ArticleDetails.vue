@@ -136,7 +136,6 @@ async function generateProductDescription(event: Event) {
               </div>
             </div>
         </div>
-        <div class="text-gray-800 text-lg text-wrap leading-10" v-if="ellapsedTime > 0">Time till first byte: {{ ellapsedTime }}ms</div>
         </aside>
         <div :class="[aiResponse ? 'grid grid-cols-1 lg:grid-cols-2 gap-8' : '']" class="mb-10">
             <aside>
